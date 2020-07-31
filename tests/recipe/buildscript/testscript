@@ -85,3 +85,28 @@
 
   $* clean 2>-
 }
+
+: diff-label
+:
+{
+  echo 'bar' >=bar;
+
+  cat <<EOI >=buildfile;
+    foo: bar
+    {{
+      echo 'baz' >? $path($<)
+    }}
+    EOI
+
+  $* 2>>/~%EOE% != 0;
+    %.+
+    %--- .+/bar%
+    +++ stdout
+    @@ -1 +1 @@
+    -bar
+    +baz
+    %.+
+    EOE
+
+  $* clean 2>-
+}
